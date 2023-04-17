@@ -85,7 +85,7 @@ void loop() {
 		case SingleButton<SingleButtonProps>::Event::Click:
 			led1_period += 64;
 			break;
-		case SingleButton<SingleButtonProps>Event::DoubleClick:
+		case SingleButton<SingleButtonProps>::Event::DoubleClick:
 			led2_period += 64;
 			break;
 		default:
