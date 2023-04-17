@@ -1,0 +1,15 @@
+{
+    "configurations": [
+      {
+        "name": "myConfigurationName",
+        "configurationProvider": "ms-vscode.cmake-tools",
+        "includePath": ["${workspaceFolder}/**"],
+        "defines": [],
+        "compilerPath": "C:\\devtools\\xpack-arm-none-eabi-gcc-12.2.1-1.2\\bin\\arm-none-eabi-g++.exe",
+        "cStandard": "c11",
+        "cppStandard": "c++17",
+        "IntelliSenseMode": "gcc-arm"
+      }
+    ],
+    "version": 4
+  }

@@ -1,0 +1,18 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "cortex-debug.openocdPath.windows": "C:\\devtools\\xpack-openocd-0.12.0-1\\bin\\openocd.exe", 
+    "cortex-debug.gdbPath.windows": "C:\\devtools\\xpack-arm-none-eabi-gcc-12.2.1-1.2\\bin\\arm-none-eabi-gdb.exe",
+    "cortex-debug.objdumpPath.windows": "C:\\devtools\\xpack-arm-none-eabi-gcc-12.2.1-1.2\\bin\\arm-none-eabi-objdump.exe",
+    "files.associations": {
+        "newlib.h": "c",
+        "_newlib_version.h": "c",
+        "cstdlib": "cpp",
+        "list": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c"
+    },
+    "cortex-debug.registerUseNaturalFormat": false,
+    "cortex-debug.variableUseNaturalFormat": true,
+    
+}
