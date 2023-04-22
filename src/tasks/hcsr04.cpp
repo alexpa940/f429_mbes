@@ -9,17 +9,17 @@
 #include "hcsr04.h"
 #include "startup_stm32f429.h"
 
-#define RANGEFINDER_TASK_PRIO     4
+#define RANGEFINDER_TASK_PRIO     6
 #define RANGEFINDER_STK_SIZE      configMINIMAL_STACK_SIZE
 static TaskHandle_t RangefinderTask_Handler;
 
 struct RangefinderProps {
-	using EchoPin = Pin<'A', 8>;
-	using TrigPin = Pin<'G', 4, 'H'>;
-	using RangefinderTim = STM32::TIM::Timer<STM32::TIM::TIM_1>;
-	using EchoPinExti = STM32::ExtInt<EchoPin, STM32::Edge::Both>;
-	static constexpr unsigned sourceClock { 160000000 }; //!< timer source clock
-	static constexpr unsigned trigTime { 10 }; //!< trigger impulse len (milliseconds)
+	using EchoPin = Pin<'A', 5>;
+	using TrigPin = Pin<'C', 3, 'H'>;
+	using RangefinderTim = STM32::TIM::Timer<STM32::TIM::TIM_2>;
+	using TimCh = STM32::TIM::Timer<STM32::TIM::TIM_2>::CCModule<1>;
+	static constexpr unsigned sourceClock { 84000000 }; //!< timer source clock
+	static constexpr unsigned trigTime { 20 }; //!< trigger impulse len (milliseconds)
 	static constexpr unsigned chNum { 1 };    //!< timer channel
 };
 
@@ -29,6 +29,14 @@ void hc_sr04::start() {
 
 	hc_sr04::interruptSemaphore = xSemaphoreCreateBinary();
 	hc_sr04::dataSemaphore = xSemaphoreCreateMutex();
+	NVIC_SetPriority(TIM2_IRQn, 5);
+	NVIC_EnableIRQ(TIM2_IRQn);
+
+	RangefinderProps::TrigPin::Mode(OUTPUT);
+	RangefinderProps::TrigPin::Off();
+	RangefinderProps::EchoPin::Mode(ALT_INPUT_PULLDOWN);
+	RangefinderProps::EchoPin::Alternate(ALT_FUNC_TIM2);
+
 	rangefinder.init();
 
 	xTaskCreate((TaskFunction_t) hc_sr04::task_cb, (const char*) "HC-SR04",
@@ -52,10 +60,10 @@ void hc_sr04::task_cb(void*) {
 	static uint32_t second_measure = 0;
 	while (1) {
 		rangefinder.start_measure();
-		if ( xSemaphoreTake( hc_sr04::interruptSemaphore, 200 ) == pdPASS) {
+		if ( xSemaphoreTake( hc_sr04::interruptSemaphore, 2000 ) == pdPASS) {
 			first_measure = rangefinder.first_state_measure();
 
-			if ( xSemaphoreTake( hc_sr04::interruptSemaphore, 200 ) == pdPASS) {
+			if ( xSemaphoreTake( hc_sr04::interruptSemaphore, 2000 ) == pdPASS) {
 				second_measure = rangefinder.second_state_measure();
 
 				if ( xSemaphoreTake(hc_sr04::dataSemaphore,
@@ -76,15 +84,17 @@ void hc_sr04::task_cb(void*) {
 	}
 }
 
-void sExti::line5Handler() {
+
+void sTim2::handler()
+{
 	static BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	RangefinderProps::EchoPinExti::Interrupt::clear();
+	RangefinderProps::TimCh::Interrupt::Clear();
 	xSemaphoreGiveFromISR(hc_sr04::interruptSemaphore,
 			&xHigherPriorityTaskWoken);
 
-//	RangefinderProps::RangefinderTim::Ch1::Interrupt::Clear();
 	if (xHigherPriorityTaskWoken) {
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	}
 }
+

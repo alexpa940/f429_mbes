@@ -6,16 +6,27 @@
  */
 #include "board_props.hpp"
 
+#include "hal_stm_lvgl/stm32f429i_discovery.h"
+
+#include "lvgl/lvgl.h"
+#include "lvgl/demos/widgets/lv_demo_widgets.h"
+
+#include "hal_stm_lvgl/tft/tft.h"
+#include "hal_stm_lvgl/touchpad/touchpad.h"
+
+#include "wlvgl.h"
+
 SingleButton<SingleButtonProps> UBUTTON;
 
 typedef UartDbg<SampleUartDbgProps> uart;
 
 void setup() {
-//	HAL_Init();
+	HAL_Init();
 	__HAL_RCC_GPIOG_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
+
 	LD3::Mode(OUTPUT);
 	LD4::Mode(OUTPUT);
 	UBUTTON_PIN::Mode(INPUT);
@@ -28,33 +39,42 @@ void setup() {
 
 	printf("Project compiled AT %s\r\n", compile_dt);
 
-	Wire1.begin(I2C1);
+	// Wire1.begin(I2C1);
 
-    uint8_t error, address;
-    int nDevices;
+    // uint8_t error, address;
+    // int nDevices;
 
 	
-    nDevices = 0;
-	for(address = 8; address < 127; address++ ){
-		Wire1.beginTransmission(address);
-		error = Wire1.endTransmission();
+    // nDevices = 0;
+	// for(address = 8; address < 127; address++ ){
+	// 	Wire1.beginTransmission(address);
+	// 	error = Wire1.endTransmission();
 
-		if (error == 0){
-			printf("I2C device found at address 0x");
-			if (address<16)
-				printf("0");
-			printf("%02X", address);
-			printf(" !\r\n");
+	// 	if (error == 0){
+	// 		printf("I2C device found at address 0x");
+	// 		if (address<16)
+	// 			printf("0");
+	// 		printf("%02X", address);
+	// 		printf(" !\r\n");
 
-			nDevices++;
-		}
-		else if (error==4) {
-			printf("Unknow error at address 0x");
-			if (address<16)
-				printf("0");
-			printf("%02X\r\n", address);
-		}
-	}
+	// 		nDevices++;
+	// 	}
+	// 	else if (error==4) {
+	// 		printf("Unknow error at address 0x");
+	// 		if (address<16)
+	// 			printf("0");
+	// 		printf("%02X\r\n", address);
+	// 	}
+	// }
+
+	lv_init();
+
+	tft_init();
+	touchpad_init();
+
+	lv_demo_widgets();
+
+	wlvgl::start();
 };
 
 void loop() {

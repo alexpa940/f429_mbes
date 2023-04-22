@@ -42,6 +42,9 @@ extern "C" void SystemCoreClockUpdate(void);
 extern "C" void xPortSysTickHandler( void );
 extern "C" void xPortPendSVHandler( void );
 extern "C" void vPortSVCHandler( void );
+
+extern "C" void LTDC_IRQHandler( void );
+
 extern "C" void __libc_init_array(void); //c++ call constructors
 
 /********************************************************************************

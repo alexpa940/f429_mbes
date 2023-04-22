@@ -21,16 +21,35 @@ add_subdirectory(src)
 add_subdirectory(libs/FreeRTOS)
 add_subdirectory(libs/stm32tpl)
 add_subdirectory(libs/TWI_Wrapper)
+add_subdirectory(lvgl)
+add_subdirectory(hal_stm_lvgl)
+
+set(LV_CONF_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/lv_conf.h
+    CACHE STRING "" FORCE)
+
+set(LV_DEMO_CONF_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/lv_demo_conf.h
+    CACHE STRING "" FORCE)
+
+# set(TARGET_LIBS
+#     "c"
+#     "m"
+#     "nosys"
+#     lvgl::lvgl
+# )
 
 set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/Linker/link.ld)
 target_link_options(${TARGET_ELF} PUBLIC -T${LINKER_SCRIPT})
 target_link_options(${TARGET_ELF} PUBLIC -Wl,-Map=$<TARGET_FILE:${TARGET_ELF}>.map)
+target_link_libraries(${TARGET_ELF} lvgl::lvgl lvgl::demos)
 
 target_include_directories(${TARGET_ELF} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${TARGET_ELF} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_custom_command(TARGET ${TARGET_ELF} POST_BUILD
-    COMMAND ${CROSS_OBJDUMP} "-dx" $<TARGET_FILE:${TARGET_ELF}> > $<TARGET_FILE:${TARGET_ELF}>.lst
-    COMMENT "Generating disassembler file")
+# add_custom_command(TARGET ${TARGET_ELF} POST_BUILD
+#     COMMAND ${CROSS_OBJDUMP} "-dx" $<TARGET_FILE:${TARGET_ELF}> > $<TARGET_FILE:${TARGET_ELF}>.lst
+#     COMMENT "Generating disassembler file")
 add_custom_command(TARGET ${TARGET_ELF} POST_BUILD
     COMMAND ${CROSS_OBJCOPY} "-Obinary" $<TARGET_FILE:${TARGET_ELF}> $<TARGET_FILE:${TARGET_ELF}>.bin
     COMMENT "Generating bin file")

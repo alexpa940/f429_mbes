@@ -46,7 +46,7 @@ set(CMAKE_CXX_FLAGS_RELEASE ${FLAGS_RELEASE})
 set(CMAKE_CXX_FLAGS_MINSIZEREL ${FLAGS_SIZE})
 SET(CMAKE_ASM_FLAGS "${CFLAGS} ${CPU_FLAGS} -x assembler-with-cpp")
 
-set(LD_FLAGS "--specs=nano.specs -u _printf_float -nostartfiles -Wl,--gc-sections -Wl,--print-memory-usage -Xlinker --wrap=malloc -Xlinker --wrap=_malloc_r")
+set(LD_FLAGS "--specs=nano.specs --specs=nosys.specs -u _printf_float -nostartfiles -Wl,--gc-sections -Wl,--print-memory-usage")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CPU_FLAGS}  ${LD_FLAGS}" CACHE INTERNAL "") 
 

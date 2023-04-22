@@ -41,7 +41,7 @@ static INLINE void InitializeData() {
 }
 
 extern "C" void ResetHandler() {
-	SetSysClock();
+	// SetSysClock();
 	SystemInit();
 	InitializeData();
 	SystemCoreClockUpdate();
@@ -112,7 +112,22 @@ __attribute__ ((used,section(".isr_vector"))) void
 	sSpi2::handler,
 	sUsart1::handler,
 	sUsart2::handler,
-	sUsart3::handler
+	sUsart3::handler,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,
+	LTDC_IRQHandler
 };
 
 /********************************************************************************
