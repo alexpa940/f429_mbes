@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#define LV_USE_DEMO_WIDGETS        1
+#define LV_USE_DEMO_WIDGETS        0
 #if LV_USE_DEMO_WIDGETS
 #define LV_DEMO_WIDGETS_SLIDESHOW  0
 #endif
@@ -283,7 +283,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8     0
 #define LV_FONT_MONTSERRAT_10    0
-#define LV_FONT_MONTSERRAT_12    0
+#define LV_FONT_MONTSERRAT_12    1
 #define LV_FONT_MONTSERRAT_14    1
 #define LV_FONT_MONTSERRAT_16    0
 #define LV_FONT_MONTSERRAT_18    0
@@ -492,7 +492,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #if LV_USE_THEME_DEFAULT
 
 /*0: Light mode; 1: Dark mode*/
-# define LV_THEME_DEFAULT_DARK     0
+# define LV_THEME_DEFAULT_DARK     1
 
 /*1: Enable grow on press*/
 # define LV_THEME_DEFAULT_GROW              1

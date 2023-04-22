@@ -6,4 +6,9 @@ target_sources(${TARGET_ELF} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOSHooks.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/app.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/stm32f4xx_hal_msp.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/gui/main_page.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/gui/lv_analogclock.c
 )
+
+target_include_directories(${TARGET_ELF} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/gui)
+

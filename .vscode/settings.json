@@ -16,7 +16,10 @@
         "lv_demo_widgets.h": "c",
         "lv_demo_benchmark.h": "c",
         "lv_gpu_stm32_dma2d.h": "c",
-        "compare": "c"
+        "compare": "c",
+        "page_1.h": "c",
+        "main_page.h": "c",
+        "lv_analogclock.h": "c"
     },
     "cortex-debug.registerUseNaturalFormat": false,
     "cortex-debug.variableUseNaturalFormat": true,

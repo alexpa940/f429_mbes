@@ -9,12 +9,14 @@
 #include "hal_stm_lvgl/stm32f429i_discovery.h"
 
 #include "lvgl/lvgl.h"
-#include "lvgl/demos/widgets/lv_demo_widgets.h"
+#include "lv_analogclock.h"
 
 #include "hal_stm_lvgl/tft/tft.h"
 #include "hal_stm_lvgl/touchpad/touchpad.h"
 
 #include "wlvgl.h"
+
+#include "main_page.h"
 
 SingleButton<SingleButtonProps> UBUTTON;
 
@@ -72,9 +74,13 @@ void setup() {
 	tft_init();
 	touchpad_init();
 
-	lv_demo_widgets();
+	//lv_demo_widgets();
+	
 
 	wlvgl::start();
+	wlvgl::takeMutex();
+	setup_main_page_gui();
+	wlvgl::giveMutex();
 };
 
 void loop() {
@@ -122,6 +128,11 @@ void loop() {
 		printf("Высота: %.2f (м)\r\n", distance);
 		printf("Free heap size = %u\r\n", xPortGetFreeHeapSize());
 		printf("\r\n");
+
+		wlvgl::takeMutex();
+		lv_chart_set_next_value(main_ui.analog_clock_1_chart_1, main_ui.analog_clock_1_chart_1_0, distance*100);
+		lv_analogclock_set_time(main_ui.analog_clock_1_analog_clock_1, _time.tm_hour, _time.tm_min, _time.tm_sec);
+		wlvgl::giveMutex();
 		time_pull = xTaskGetTickCount();
 	}
 }
