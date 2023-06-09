@@ -11,6 +11,7 @@ add_definitions(-DSTM32F429xx)
 add_definitions(-DUSE_HAL_DRIVER)
 add_definitions(-DHSE_VALUE=8000000)
 add_definitions(-DSTM32F429_439xx)
+add_definitions(-DLV_CONF_PATH=${CMAKE_CURRENT_SOURCE_DIR}/include/lv_conf.h)
 
 add_executable(${TARGET_ELF} src/main.cpp)
 enable_language(C CXX ASM)

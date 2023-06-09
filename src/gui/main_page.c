@@ -1,14 +1,84 @@
 #include "main_page.h"
-
+#include <stdio.h>
+#include "lv_analogclock.h"
 /**********************
  *       WIDGETS
  **********************/
+LV_IMG_DECLARE(compass);
+LV_IMG_DECLARE(compass_earth);
+LV_IMG_DECLARE(compass_index);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
 lv_ui main_ui;
+static lv_obj_t *compass_obj, *compass_txt;
+static lv_obj_t *compass_screen_obj;
+static lv_obj_t *roll, *pitch, *yaw;
+
+static char yaw_text[64];
+static char pitch_text[64];
+static char roll_text[64];
+
+/*
+ *   GLOBAL FUNCTIONS
+ *****************************************************************************************
+ */
+
+void set_gpos(float r, float p, float y)
+{
+	memset(roll_text, 0, 64);
+	memset(pitch_text, 0, 64);
+	memset(yaw_text, 0, 64);
+
+	snprintf(roll_text, 64, "roll = %0.2f°", r);
+	lv_label_set_text(roll, roll_text);
+
+	snprintf(pitch_text, 64, "pitch = %0.2f°", p);
+	lv_label_set_text(pitch, pitch_text);
+
+	snprintf(yaw_text, 64, "yaw = %0.2f°", y);
+	lv_label_set_text(yaw, yaw_text);
+}
+
+void compass_rotate(int16_t angle)
+{
+        uint8_t text[20];
+
+        if (!compass_obj || !compass_txt) {
+                return;
+        }
+
+        /* Set the rotation center of the image. */
+        lv_img_set_pivot(compass_obj, compass.header.w / 2, compass.header.h / 2);
+
+        /* Angle has 0.1 degree precision, so for 45.8 set 458. */
+        lv_img_set_angle(compass_obj, (360 - angle) * 10);
+        if ((angle < 45) || (angle == 360)) {
+                sprintf((char*)text, "%s %d", "#FF4500 N ", angle);
+        } else if ((angle >= 45) && (angle < 90)) {
+                sprintf((char*)text, "%s %d", "#FF4500 NE ", angle);
+        } else if ((angle >= 90) && (angle < 135)) {
+                sprintf((char*)text, "%s %d", "#FF4500 E ", angle);
+        } else if ((angle >= 135) && (angle < 180)) {
+                sprintf((char*)text, "%s %d", "#FF4500 SE ", angle);
+        } else if ((angle >= 180) && (angle < 225)) {
+                sprintf((char*)text, "%s %d", "#FF4500 S ", angle);
+        } else if ((angle >= 225) && (angle < 270)) {
+                sprintf((char*)text, "%s %d", "#FF4500 SW ", angle);
+        } else if ((angle >= 270) && (angle < 315)) {
+                sprintf((char*)text, "%s %d", "#FF4500 W ", angle);
+        } else if ((angle >= 315) && (angle < 360)) {
+                sprintf((char*)text, "%s %d", "#FF4500 NW ", angle);
+        }
+        lv_label_set_text(compass_txt, (char*)text);
+}
+
+/*
+ *   STATIC FUNCTIONS
+ *****************************************************************************************
+ */
 
 void ui_init_style(lv_style_t * style)
 {
@@ -37,6 +107,7 @@ __attribute__((unused)) static void ta_screen_event_cb(lv_event_t *e)
 		lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 	}
 }
+
 
 void setup_scr_screen(lv_ui *ui){
 
@@ -79,9 +150,41 @@ void setup_scr_screen(lv_ui *ui){
 
 	//IMU
 	ui->analog_clock_1_tabview_1_IMU = lv_tabview_add_tab(ui->analog_clock_1_tabview_1,"IMU");
-	lv_obj_t * analog_clock_1_tabview_1_IMU_label = lv_label_create(ui->analog_clock_1_tabview_1_IMU);
-	lv_label_set_text(analog_clock_1_tabview_1_IMU_label, "con3");
+	// lv_obj_t * analog_clock_1_tabview_1_IMU_label = lv_label_create(ui->analog_clock_1_tabview_1_IMU);
+	// lv_label_set_text(analog_clock_1_tabview_1_IMU_label, "con3");
+	compass_screen_obj = lv_obj_create(ui->analog_clock_1_tabview_1_IMU);
+	lv_obj_set_style_bg_color(compass_screen_obj, lv_color_black(), LV_PART_MAIN);
+	lv_obj_clear_flag(compass_screen_obj, LV_OBJ_FLAG_GESTURE_BUBBLE);
+	lv_obj_align(compass_screen_obj, LV_ALIGN_CENTER, 0, 0);
 
+	compass_obj = lv_img_create(compass_screen_obj);
+    lv_img_set_src(compass_obj, &compass);
+	lv_obj_align(compass_obj, LV_ALIGN_CENTER, 0, 0);
+
+
+	compass_txt = lv_label_create(compass_screen_obj);
+	lv_label_set_recolor(compass_txt, true);
+	lv_obj_set_style_text_font(compass_txt, &lv_font_montserrat_12, 0);
+	lv_label_set_text(compass_txt, "#FF4500 N 0");
+	lv_obj_align(compass_txt, LV_ALIGN_CENTER, 0, 0);
+
+	lv_obj_set_size(compass_screen_obj, 200, 200);
+	lv_obj_refr_size(compass_obj);
+
+	lv_scr_load(compass_screen_obj);
+
+	//*roll, *pitch, *yaw;
+	roll = lv_label_create(ui->analog_clock_1_tabview_1_IMU);
+	lv_label_set_text(roll, "roll");
+	lv_obj_set_pos(roll, 10, 230);
+
+	pitch = lv_label_create(ui->analog_clock_1_tabview_1_IMU);
+	lv_label_set_text(pitch, "pitch");
+	lv_obj_set_pos(pitch, 10, 250);
+
+	yaw = lv_label_create(ui->analog_clock_1_tabview_1_IMU);
+	lv_label_set_text(yaw, "yaw");
+	lv_obj_set_pos(yaw, 10, 270);
 
 	//Set style for analog_clock_1_tabview_1. Part: LV_PART_MAIN, State: LV_STATE_DEFAULT
 	lv_obj_set_style_radius(ui->analog_clock_1_tabview_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);

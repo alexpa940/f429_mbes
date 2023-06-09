@@ -21,7 +21,7 @@ void wlvgl::task_cb(void *)
         wlvgl::takeMutex();
         lv_task_handler();
         wlvgl::giveMutex();
-        vTaskDelay( pdMS_TO_TICKS(30) );
+        vTaskDelay( pdMS_TO_TICKS(15) );
     }
 
 }

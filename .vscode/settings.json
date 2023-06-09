@@ -19,7 +19,9 @@
         "compare": "c",
         "page_1.h": "c",
         "main_page.h": "c",
-        "lv_analogclock.h": "c"
+        "lv_analogclock.h": "c",
+        "cstdio": "cpp",
+        "random": "cpp"
     },
     "cortex-debug.registerUseNaturalFormat": false,
     "cortex-debug.variableUseNaturalFormat": true,

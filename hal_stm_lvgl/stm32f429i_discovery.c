@@ -39,6 +39,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f429i_discovery.h"
 
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 /** @defgroup BSP BSP
   * @{
   */ 
@@ -402,6 +405,8 @@ static void I2Cx_MspInit(I2C_HandleTypeDef *hi2c)
   }
 }
 
+SemaphoreHandle_t i2c_mutex;
+
 /**
   * @brief  I2Cx Bus initialization.
   */
@@ -411,7 +416,7 @@ static void I2Cx_Init(void)
   {
     I2cHandle.Instance              = DISCOVERY_I2Cx;
     I2cHandle.Init.ClockSpeed       = BSP_I2C_SPEED;
-    I2cHandle.Init.DutyCycle        = I2C_DUTYCYCLE_2;
+    I2cHandle.Init.DutyCycle        = I2C_DUTYCYCLE_16_9;
     I2cHandle.Init.OwnAddress1      = 0;
     I2cHandle.Init.AddressingMode   = I2C_ADDRESSINGMODE_7BIT;
     I2cHandle.Init.DualAddressMode  = I2C_DUALADDRESS_DISABLED;
@@ -422,6 +427,7 @@ static void I2Cx_Init(void)
     /* Init the I2C */
     I2Cx_MspInit(&I2cHandle);
     HAL_I2C_Init(&I2cHandle);
+    i2c_mutex = xSemaphoreCreateMutex();
   }
 }
 
@@ -453,9 +459,9 @@ static void I2Cx_ITConfig(void)
   * @param  Value: The target register value to be written 
   */
 static void I2Cx_WriteData(uint8_t Addr, uint8_t Reg, uint8_t Value)
-  {
+{
   HAL_StatusTypeDef status = HAL_OK;
-  
+  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
   status = HAL_I2C_Mem_Write(&I2cHandle, Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, &Value, 1, I2cxTimeout); 
   
   /* Check the communication status */
@@ -463,7 +469,8 @@ static void I2Cx_WriteData(uint8_t Addr, uint8_t Reg, uint8_t Value)
   {
     /* Re-Initialize the BUS */
     I2Cx_Error();
-  }        
+  }
+  xSemaphoreGive(i2c_mutex);        
 }
 
 /**
@@ -474,9 +481,9 @@ static void I2Cx_WriteData(uint8_t Addr, uint8_t Reg, uint8_t Value)
   * @param  Length: buffer size to be written
   */
 static void I2Cx_WriteBuffer(uint8_t Addr, uint8_t Reg,  uint8_t *pBuffer, uint16_t Length)
-  {
+{
   HAL_StatusTypeDef status = HAL_OK;
-  
+  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
   status = HAL_I2C_Mem_Write(&I2cHandle, Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Length, I2cxTimeout); 
 
   /* Check the communication status */
@@ -484,7 +491,8 @@ static void I2Cx_WriteBuffer(uint8_t Addr, uint8_t Reg,  uint8_t *pBuffer, uint1
   {
     /* Re-Initialize the BUS */
     I2Cx_Error();
-  }        
+  }
+  xSemaphoreGive(i2c_mutex);         
 }
 
 /**
@@ -497,7 +505,7 @@ static uint8_t I2Cx_ReadData(uint8_t Addr, uint8_t Reg)
 {
   HAL_StatusTypeDef status = HAL_OK;
   uint8_t value = 0;
-  
+  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
   status = HAL_I2C_Mem_Read(&I2cHandle, Addr, Reg, I2C_MEMADD_SIZE_8BIT, &value, 1, I2cxTimeout);
  
   /* Check the communication status */
@@ -507,6 +515,7 @@ static uint8_t I2Cx_ReadData(uint8_t Addr, uint8_t Reg)
     I2Cx_Error();
   
   }
+  xSemaphoreGive(i2c_mutex);
   return value;
 }
 
@@ -521,9 +530,9 @@ static uint8_t I2Cx_ReadData(uint8_t Addr, uint8_t Reg)
 static uint8_t I2Cx_ReadBuffer(uint8_t Addr, uint8_t Reg, uint8_t *pBuffer, uint16_t Length)
 {
   HAL_StatusTypeDef status = HAL_OK;
-
+  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
   status = HAL_I2C_Mem_Read(&I2cHandle, Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Length, I2cxTimeout);
-  
+  xSemaphoreGive(i2c_mutex);
   /* Check the communication status */
   if(status == HAL_OK)
   {

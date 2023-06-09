@@ -18,9 +18,12 @@
 
 #include "main_page.h"
 
+#include "imu.h"
+
 SingleButton<SingleButtonProps> UBUTTON;
 
 typedef UartDbg<SampleUartDbgProps> uart;
+struct imu_data_s imu_data;
 
 void setup() {
 	HAL_Init();
@@ -41,41 +44,13 @@ void setup() {
 
 	printf("Project compiled AT %s\r\n", compile_dt);
 
-	// Wire1.begin(I2C1);
-
-    // uint8_t error, address;
-    // int nDevices;
-
-	
-    // nDevices = 0;
-	// for(address = 8; address < 127; address++ ){
-	// 	Wire1.beginTransmission(address);
-	// 	error = Wire1.endTransmission();
-
-	// 	if (error == 0){
-	// 		printf("I2C device found at address 0x");
-	// 		if (address<16)
-	// 			printf("0");
-	// 		printf("%02X", address);
-	// 		printf(" !\r\n");
-
-	// 		nDevices++;
-	// 	}
-	// 	else if (error==4) {
-	// 		printf("Unknow error at address 0x");
-	// 		if (address<16)
-	// 			printf("0");
-	// 		printf("%02X\r\n", address);
-	// 	}
-	// }
-
 	lv_init();
 
 	tft_init();
 	touchpad_init();
 
 	//lv_demo_widgets();
-	
+	imu::start();
 
 	wlvgl::start();
 	wlvgl::takeMutex();
@@ -83,11 +58,16 @@ void setup() {
 	wlvgl::giveMutex();
 };
 
+extern "C" void compass_rotate(int16_t angle);
+extern "C" void set_gpos(float r, float p, float y);
+
 void loop() {
 	static uint32_t led1 = xTaskGetTickCount();
 	static uint32_t led2 = xTaskGetTickCount();
 	static uint32_t button_pull = xTaskGetTickCount();
 	static uint32_t time_pull = xTaskGetTickCount();
+	static uint32_t distance_pull = xTaskGetTickCount();
+	static uint32_t imu_pull = xTaskGetTickCount();
 	static uint8_t led1_period = 1;
 	static uint8_t led2_period = 1;
 	static struct tm _time;
@@ -125,15 +105,33 @@ void loop() {
 		float distance = hc_sr04::get_data_safe() / 100;
 		printf("Время %02d:%02d:%02d (hh:mm:ss)\r\n", _time.tm_hour,
 				_time.tm_min, _time.tm_sec);
+		printf("Углы ориентации: %0.2f/%0.2f/%0.2f (град/град/град)\r\n", imu_data.yaw, imu_data.pitch, imu_data.roll);
 		printf("Высота: %.2f (м)\r\n", distance);
-		printf("Free heap size = %u\r\n", xPortGetFreeHeapSize());
+		printf("Направление движения: %d (град)\r\n", imu_data.heading);
+		//printf("Free heap size = %u\r\n", xPortGetFreeHeapSize());
 		printf("\r\n");
 
 		wlvgl::takeMutex();
-		lv_chart_set_next_value(main_ui.analog_clock_1_chart_1, main_ui.analog_clock_1_chart_1_0, distance*100);
 		lv_analogclock_set_time(main_ui.analog_clock_1_analog_clock_1, _time.tm_hour, _time.tm_min, _time.tm_sec);
 		wlvgl::giveMutex();
 		time_pull = xTaskGetTickCount();
+	}
+
+	if (xTaskGetTickCount() - distance_pull > 300) {
+		float distance = hc_sr04::get_data_safe() / 100;
+		wlvgl::takeMutex();
+		lv_chart_set_next_value(main_ui.analog_clock_1_chart_1, main_ui.analog_clock_1_chart_1_0, distance*100);
+		wlvgl::giveMutex();
+		distance_pull = xTaskGetTickCount();
+	}
+
+	if (xTaskGetTickCount() - imu_pull > 200) {
+		imu::getDataSafe(&imu_data);
+		wlvgl::takeMutex();
+		compass_rotate(imu_data.heading);
+		set_gpos(imu_data.roll, imu_data.pitch, imu_data.yaw);
+		wlvgl::giveMutex();
+		imu_pull = xTaskGetTickCount();
 	}
 }
 

@@ -80,7 +80,7 @@ void hc_sr04::task_cb(void*) {
 			rangefinder.second_state_measure();
 		}
 
-		vTaskDelay(250);
+		vTaskDelay(50);
 	}
 }
 

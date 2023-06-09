@@ -17,12 +17,9 @@
 
 struct hc_sr04 {
 public:
-	static void
-	start();
-	static void
-	task_cb(void*);
-	static float
-	get_data_safe();
+	static void start();
+	static void task_cb(void*);
+	static float get_data_safe();
 	static inline SemaphoreHandle_t interruptSemaphore;
 	static inline SemaphoreHandle_t dataSemaphore;
 	static inline float last_distance = 0;

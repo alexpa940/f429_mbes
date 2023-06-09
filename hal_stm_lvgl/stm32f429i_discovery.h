@@ -180,7 +180,7 @@ typedef enum
    Make sure that this define is not already declared in other files.
    It can be used in parallel by other modules. */
 #ifndef BSP_I2C_SPEED
- #define BSP_I2C_SPEED                          100000
+ #define BSP_I2C_SPEED                          400000
 #endif /* BSP_I2C_SPEED */
 
 #define I2Cx_TIMEOUT_MAX                    0x3000 /*<! The value of the maximal timeout for I2C waiting loops */
