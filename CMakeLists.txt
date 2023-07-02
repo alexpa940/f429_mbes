@@ -21,7 +21,6 @@ add_subdirectory(system)
 add_subdirectory(src)
 add_subdirectory(libs/FreeRTOS)
 add_subdirectory(libs/stm32tpl)
-add_subdirectory(libs/TWI_Wrapper)
 add_subdirectory(lvgl)
 add_subdirectory(hal_stm_lvgl)
 

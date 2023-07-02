@@ -25,5 +25,6 @@
     },
     "cortex-debug.registerUseNaturalFormat": false,
     "cortex-debug.variableUseNaturalFormat": true,
+    "cmake.configureOnOpen": true,
     
 }

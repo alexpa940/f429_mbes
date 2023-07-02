@@ -299,7 +299,7 @@ void setup_scr_screen(lv_ui *ui){
 	lv_obj_set_style_line_width(ui->analog_clock_1_chart_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
 	lv_obj_set_style_line_opa(ui->analog_clock_1_chart_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 	lv_chart_set_type(ui->analog_clock_1_chart_1, LV_CHART_TYPE_LINE);
-	lv_chart_set_range(ui->analog_clock_1_chart_1,LV_CHART_AXIS_PRIMARY_Y, 0, 300);
+	lv_chart_set_range(ui->analog_clock_1_chart_1,LV_CHART_AXIS_PRIMARY_Y, 0, 100);
 	lv_chart_set_div_line_count(ui->analog_clock_1_chart_1, 3, 10);
 	lv_chart_set_point_count(ui->analog_clock_1_chart_1, 5);
 	lv_chart_set_axis_tick(ui->analog_clock_1_chart_1, LV_CHART_AXIS_PRIMARY_Y, 5, 2, 10, 2, true, 40);

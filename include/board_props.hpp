@@ -15,8 +15,6 @@
 #include "cstring"
 #include "cstdio"
 
-#include "Wire.h"
-
 static const char *compile_dt = __DATE__ " " __TIME__;
 
 using LD3 = Pin<'G', 13, 'H'>;
